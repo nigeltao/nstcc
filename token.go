@@ -20,18 +20,18 @@ func hashFunc(h uint32, c uint8) uint32 {
 	return h*263 + uint32(c)
 }
 
-type Map struct {
-	tableIdent []*TokenSym
-	hashIdent  [hashSize]*TokenSym
+type idents struct {
+	list []*tokenSym
+	hash [hashSize]*tokenSym
 }
 
 // The TCC code calls this tok_alloc.
-func (m *Map) Find(s []byte) (*TokenSym, error) {
+func (m *idents) byStr(s []byte) (*tokenSym, error) {
 	h := uint32(hashInit)
 	for _, c := range s {
 		h = hashFunc(h, c)
 	}
-	p := &m.hashIdent[h&(hashSize-1)]
+	p := &m.hash[h&(hashSize-1)]
 	for {
 		t := *p
 		if t == nil {
@@ -46,36 +46,36 @@ func (m *Map) Find(s []byte) (*TokenSym, error) {
 }
 
 // The TCC code calls this tok_alloc_new.
-func (m *Map) alloc(p **TokenSym, s []byte) (*TokenSym, error) {
-	tok := TokIdent + Token(len(m.tableIdent))
+func (m *idents) alloc(p **tokenSym, s []byte) (*tokenSym, error) {
+	tok := tokIdent + token(len(m.list))
 	if tok >= symFirstAnom {
-		return nil, errors.New("token: memory full")
+		return nil, errors.New("nstcc: memory full")
 	}
-	t := &TokenSym{
+	t := &tokenSym{
 		tok: tok,
 		str: dup(s),
 	}
-	m.tableIdent = append(m.tableIdent, t)
+	m.list = append(m.list, t)
 	*p = t
 	return t, nil
 }
 
-// TokIdent is the Token value of the first identifier token. Token values
-// greater than or equal to TokIdent represent identifiers. Token values less
-// than TokIdent represent symbols.
-const TokIdent = 256
+// tokIdent is the token value of the first identifier token. Token values
+// greater than or equal to tokIdent represent identifiers. Token values less
+// than tokIdent represent symbols.
+const tokIdent = 256
 
-type Token int32
+type token int32
 
-type TokenSym struct {
-	hashNext *TokenSym
+type tokenSym struct {
+	hashNext *tokenSym
 	// TODO: symThis, symThat.
-	tok Token
+	tok token
 	str []byte
 }
 
 const symFirstAnom = 0x10000000 // First anonymous sym.
 
-type Sym struct {
+type sym struct {
 	// TODO.
 }
