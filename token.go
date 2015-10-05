@@ -25,6 +25,10 @@ type idents struct {
 	hash [hashSize]*tokenSym
 }
 
+func (m *idents) byTok(t token) *tokenSym {
+	return m.list[t-tokIdent]
+}
+
 // The TCC code calls this tok_alloc.
 func (m *idents) byStr(s []byte) (*tokenSym, error) {
 	h := uint32(hashInit)
@@ -33,31 +37,31 @@ func (m *idents) byStr(s []byte) (*tokenSym, error) {
 	}
 	p := &m.hash[h&(hashSize-1)]
 	for {
-		t := *p
-		if t == nil {
+		y := *p
+		if y == nil {
 			break
 		}
-		if bytes.Equal(s, t.str) {
-			return t, nil
+		if bytes.Equal(s, y.str) {
+			return y, nil
 		}
-		p = &t.hashNext
+		p = &y.hashNext
 	}
 	return m.alloc(p, s)
 }
 
 // The TCC code calls this tok_alloc_new.
 func (m *idents) alloc(p **tokenSym, s []byte) (*tokenSym, error) {
-	tok := tokIdent + token(len(m.list))
-	if tok >= symFirstAnom {
+	t := tokIdent + token(len(m.list))
+	if t >= symFirstAnom {
 		return nil, errors.New("nstcc: memory full")
 	}
-	t := &tokenSym{
-		tok: tok,
+	y := &tokenSym{
+		tok: t,
 		str: dup(s),
 	}
-	m.list = append(m.list, t)
-	*p = t
-	return t, nil
+	m.list = append(m.list, y)
+	*p = y
+	return y, nil
 }
 
 // tokIdent is the token value of the first identifier token. Token values
