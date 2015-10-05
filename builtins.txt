@@ -1,0 +1,17 @@
+tokInt	int
+tokVoid	void
+tokChar	char
+tokIf	if
+tokElse	else
+tokWhile	while
+tokBreak	break
+tokReturn	return
+tokFor	for
+tokExtern	extern
+tokStatic	static
+tokUnsigned	unsigned
+tokGoto	goto
+tokDo	do
+tokContinue	continue
+tokSwitch	switch
+tokCase	case

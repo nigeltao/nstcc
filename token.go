@@ -1,3 +1,5 @@
+//go:generate go run gen.go
+
 package nstcc
 
 import (
@@ -18,6 +20,16 @@ const (
 
 func hashFunc(h uint32, c uint8) uint32 {
 	return h*263 + uint32(c)
+}
+
+func newIdents() *idents {
+	m := &idents{}
+	i := uint32(0)
+	for _, j := range builtInTokensLengths {
+		m.byStr(builtInTokensStrings[i:j])
+		i = j
+	}
+	return m
 }
 
 type idents struct {
