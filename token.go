@@ -1,5 +1,3 @@
-//go:generate go run gen.go
-
 package nstcc
 
 import (
@@ -22,19 +20,17 @@ func hashFunc(h uint32, c uint8) uint32 {
 	return h*263 + uint32(c)
 }
 
-func newIdents() *idents {
-	m := &idents{}
+type idents struct {
+	list []*tokenSym
+	hash [hashSize]*tokenSym
+}
+
+func (m *idents) init() {
 	i := uint32(0)
 	for _, j := range builtInTokensLengths {
 		m.byStr(builtInTokensStrings[i:j])
 		i = j
 	}
-	return m
-}
-
-type idents struct {
-	list []*tokenSym
-	hash [hashSize]*tokenSym
 }
 
 func (m *idents) byTok(t token) *tokenSym {
@@ -144,16 +140,3 @@ const (
 	// less than tokIdent represent symbols.
 	tokIdent token = 0x100
 )
-
-type tokenSym struct {
-	hashNext *tokenSym
-	// TODO: symThis, symThat.
-	tok token
-	str []byte
-}
-
-const symFirstAnom = 0x10000000 // First anonymous sym.
-
-type sym struct {
-	// TODO.
-}
