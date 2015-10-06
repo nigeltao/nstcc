@@ -76,12 +76,74 @@ func (m *idents) alloc(p **tokenSym, s []byte) (*tokenSym, error) {
 	return y, nil
 }
 
-// tokIdent is the token value of the first identifier token. Token values
-// greater than or equal to tokIdent represent identifiers. Token values less
-// than tokIdent represent symbols.
-const tokIdent = 256
-
 type token int32
+
+const (
+	tokULT    token = 0x92
+	tokUGE    token = 0x93
+	tokEq     token = 0x94
+	tokNE     token = 0x95
+	tokULE    token = 0x96
+	tokUGT    token = 0x97
+	tokNset   token = 0x98
+	tokNclear token = 0x99
+	tokLT     token = 0x9c
+	tokGE     token = 0x9d
+	tokLE     token = 0x9e
+	tokGT     token = 0x9f
+
+	tokLAnd token = 0xa0
+	tokLOr  token = 0xa1
+
+	tokDec       token = 0xa2
+	tokMid       token = 0xa3
+	tokInc       token = 0xa4
+	tokUDiv      token = 0xb0
+	tokUMod      token = 0xb1
+	tokPDiv      token = 0xb2
+	tokCInt      token = 0xb3
+	tokCChar     token = 0xb4
+	tokStr       token = 0xb5
+	tokTwoSharps token = 0xb6
+	tokLChar     token = 0xb7
+	toklStr      token = 0xb8
+	tokCFloat    token = 0xb9
+	tokLineNum   token = 0xba
+	tokCDouble   token = 0xc0
+	tokCLDouble  token = 0xc1
+	tokUMull     token = 0xc2
+	tokAddC1     token = 0xc3
+	tokAddC2     token = 0xc4
+	tokSubC1     token = 0xc5
+	tokSubC2     token = 0xc6
+	tokCUint     token = 0xc8
+	tokCLLong    token = 0xc9
+	tokCULLong   token = 0xca
+	tokArrow     token = 0xcb
+	tokDots      token = 0xcc
+	tokShR       token = 0xcd
+	tokPPNum     token = 0xce
+	tokNoSubst   token = 0xcf
+
+	tokShL token = 0x01
+	tokSAR token = 0x02
+
+	tokAMod token = 0xa5
+	tokAAnd token = 0xa6
+	tokAMul token = 0xaa
+	tokAAdd token = 0xab
+	tokASub token = 0xad
+	tokADiv token = 0xaf
+	tokAXor token = 0xde
+	tokAOr  token = 0xfc
+	tokAShL token = 0x81
+	tokASAR token = 0x82
+
+	// tokIdent is the token value of the first identifier token. Token values
+	// greater than or equal to tokIdent represent identifiers. Token values
+	// less than tokIdent represent symbols.
+	tokIdent token = 0x100
+)
 
 type tokenSym struct {
 	hashNext *tokenSym
