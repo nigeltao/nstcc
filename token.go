@@ -75,6 +75,8 @@ func (m *idents) alloc(p **tokenSym, s []byte) (*tokenSym, error) {
 type token int32
 
 const (
+	tokEOF token = -1
+
 	tokULT    token = 0x92
 	tokUGE    token = 0x93
 	tokEq     token = 0x94

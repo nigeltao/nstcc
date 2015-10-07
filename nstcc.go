@@ -12,7 +12,18 @@ type Context struct {
 }
 
 func Preprocess(ctx *Context, dst io.Writer, src []byte) error {
-	return newParser(ctx, dst, src).preprocess()
+	p := newParser(ctx, dst, src)
+	p.tokFlags = tokFlagBOL | tokFlagBOF
+	p.parseFlags = parseFlagPreprocess | parseFlagLineFeed | parseFlagAsmComments | parseFlagSpaces
+	for {
+		if err := p.next(); err != nil {
+			return err
+		}
+		if p.tok == tokEOF {
+			break
+		}
+	}
+	return nil
 }
 
 type tokenSym struct {
