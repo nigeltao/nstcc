@@ -12,14 +12,14 @@ type Context struct {
 }
 
 func Preprocess(ctx *Context, dst io.Writer, src []byte) error {
-	p := newParser(ctx, dst, src)
-	p.tokFlags = tokFlagBOL | tokFlagBOF
-	p.parseFlags = parseFlagPreprocess | parseFlagLineFeed | parseFlagAsmComments | parseFlagSpaces
+	c := newCompiler(ctx, dst, src)
+	c.tokFlags = tokFlagBOL | tokFlagBOF
+	c.parseFlags = parseFlagPreprocess | parseFlagLineFeed | parseFlagAsmComments | parseFlagSpaces
 	for {
-		if err := p.next(); err != nil {
+		if err := c.next(); err != nil {
 			return err
 		}
-		if p.tok == tokEOF {
+		if c.tok == tokEOF {
 			break
 		}
 	}
