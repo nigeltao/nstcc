@@ -74,6 +74,10 @@ func (m *idents) alloc(p **tokenSym, s []byte) (*tokenSym, error) {
 
 type token int32
 
+func (t token) isSpace() bool {
+	return t == ' ' || t == '\t' || t == '\v' || t == '\f' || t == '\r'
+}
+
 const (
 	tokEOF token = -1
 
