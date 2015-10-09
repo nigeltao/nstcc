@@ -44,9 +44,10 @@ func newCompiler(ctx *Context, dst io.Writer, src []byte) *compiler {
 		bw = bufio.NewWriter(dst)
 	}
 	c := &compiler{
-		ctx: ctx,
-		dst: bw,
-		src: src,
+		ctx:      ctx,
+		dst:      bw,
+		src:      src,
+		tokFlags: tokFlagBOL | tokFlagBOF,
 	}
 	c.idents.init()
 	return c

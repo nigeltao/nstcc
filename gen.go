@@ -62,6 +62,20 @@ func main() {
 	}
 	fmt.Fprintf(w, "}\n\n")
 
+	writeIsTable(w, "isID", func(c byte) bool {
+		return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || c == '_'
+	})
+	writeIsTable(w, "isIDNum", func(c byte) bool {
+		return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || c == '_' || ('0' <= c && c <= '9')
+	})
+	writeIsTable(w, "isNum", func(c byte) bool {
+		return '0' <= c && c <= '9'
+	})
+	writeIsTable(w, "isSimpleToken", func(c byte) bool {
+		return c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}' || c == ',' ||
+			c == ';' || c == ':' || c == '?' || c == '~' || c == '$' || c == '@'
+	})
+
 	if *debug {
 		os.Stdout.Write(w.Bytes())
 		return
@@ -73,4 +87,15 @@ func main() {
 	if err := ioutil.WriteFile("table.go", out, 0660); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func writeIsTable(w *bytes.Buffer, name string, f func(c byte) bool) {
+	fmt.Fprintf(w, "var %s = [256]bool{\n", name)
+	for i := 0; i < 256; i++ {
+		fmt.Fprintf(w, "%t,", f(byte(i)))
+		if i%8 == 7 {
+			fmt.Fprintln(w)
+		}
+	}
+	fmt.Fprintf(w, "}\n\n")
 }

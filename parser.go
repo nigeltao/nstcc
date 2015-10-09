@@ -1,5 +1,9 @@
 package nstcc
 
+import (
+	"fmt"
+)
+
 func (c *compiler) next() error {
 	for {
 		if c.parseFlags&parseFlagSpaces != 0 {
@@ -47,6 +51,81 @@ func (c *compiler) nextNoMacroSpace() error {
 }
 
 func (c *compiler) nextNoMacro1() error {
-	c.tok = tokEOF
-	return nil
+redoNoStart:
+	for {
+		if c.s >= len(c.src) {
+			c.tok = tokEOF
+			return nil
+		}
+
+		switch t := c.src[c.s]; {
+		default:
+			return fmt.Errorf(`nstcc: unrecognized token '\x%02x'`, t)
+
+		case t == ' ' || t == '\t':
+			c.tok = token(t)
+			c.s++
+			return nil
+
+		case t == '\f' || t == '\v' || t == '\r':
+			c.s++
+			continue redoNoStart
+
+		case t == '\\':
+			// TODO.
+
+		case t == '\n':
+			// TODO: file->line_num++
+			c.tokFlags |= tokFlagBOL
+			c.s++
+			if c.parseFlags&parseFlagLineFeed == 0 {
+				continue redoNoStart
+			}
+			c.tok = '\n'
+			return nil
+
+		case t == '#':
+			// TODO.
+
+		case t == 'L':
+			// TODO: parse things like the wchar_t L"abc".
+			fallthrough
+
+		case isID[t]:
+			s := c.s + 1
+			for ; s < len(c.src); s++ {
+				t = c.src[s]
+				if !isIDNum[t] {
+					break
+				}
+			}
+
+			if t != '\\' {
+				ts, err := c.idents.byStr(c.src[c.s:s])
+				if err != nil {
+					return err
+				}
+				c.tok = ts.tok
+			} else {
+				// TODO.
+			}
+
+			c.tokFlags = 0
+			c.s = s
+			return nil
+
+		case t == '*':
+			// TODO: look for "*=".
+			c.tok = token(t)
+			c.tokFlags = 0
+			c.s++
+			return nil
+
+		case isSimpleToken[t]:
+			c.tok = token(t)
+			c.tokFlags = 0
+			c.s++
+			return nil
+		}
+	}
 }
