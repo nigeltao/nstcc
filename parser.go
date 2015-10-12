@@ -1,6 +1,7 @@
 package nstcc
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -121,11 +122,78 @@ redoNoStart:
 			c.s++
 			return nil
 
+		case t == '/':
+			c.s++
+			switch c.peekc() {
+			case '*':
+				c.tok = ' '
+				c.s++
+				return c.parseSlashStarComment()
+			case '/':
+				c.tok = ' '
+				c.s++
+				c.parseSlashSlashComment()
+				return nil
+			case '=':
+				c.tok = tokADiv
+				c.tokFlags = 0
+				c.s++
+				return nil
+			default:
+				c.tok = '/'
+				c.tokFlags = 0
+				c.s++
+				return nil
+			}
+
 		case isSimpleToken[t]:
 			c.tok = token(t)
 			c.tokFlags = 0
 			c.s++
 			return nil
+		}
+	}
+}
+
+func (c *compiler) peekc() token {
+	if c.s >= len(c.src) {
+		return tokEOF
+	}
+	// TODO: handle c == '\\'.
+	return token(c.src[c.s])
+}
+
+func (c *compiler) parseSlashStarComment() error {
+	star := false
+	for c.s < len(c.src) {
+		switch x := c.src[c.s]; x {
+		default:
+			c.s++
+			star = x == '*'
+		case '\n':
+			// TODO: file->line_num++
+			c.s++
+			star = false
+		case '/':
+			c.s++
+			if star {
+				return nil
+			}
+			star = false
+			// TODO: case '\\':
+		}
+	}
+	return errors.New("nstcc: unexpected end of file in comment")
+}
+
+func (c *compiler) parseSlashSlashComment() {
+	for c.s < len(c.src) {
+		switch c.src[c.s] {
+		default:
+			c.s++
+		case '\n':
+			return
+			// TODO: case '\\':
 		}
 	}
 }
