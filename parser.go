@@ -115,11 +115,59 @@ redoNoStart:
 			c.s = s
 			return nil
 
-		case t == '*':
-			// TODO: look for "*=".
-			c.tok = token(t)
-			c.tokFlags = 0
+		case t == '!':
 			c.s++
+			if c.peekc() == '=' {
+				c.s++
+				c.tok = tokNE
+			} else {
+				c.tok = '!'
+			}
+			c.tokFlags = 0
+			return nil
+
+		case t == '=':
+			c.s++
+			if c.peekc() == '=' {
+				c.s++
+				c.tok = tokEq
+			} else {
+				c.tok = '='
+			}
+			c.tokFlags = 0
+			return nil
+
+		case t == '*':
+			c.s++
+			if c.peekc() == '=' {
+				c.s++
+				c.tok = tokAMul
+			} else {
+				c.tok = '*'
+			}
+			c.tokFlags = 0
+			return nil
+
+		case t == '%':
+			c.s++
+			if c.peekc() == '=' {
+				c.s++
+				c.tok = tokAMod
+			} else {
+				c.tok = '%'
+			}
+			c.tokFlags = 0
+			return nil
+
+		case t == '^':
+			c.s++
+			if c.peekc() == '=' {
+				c.s++
+				c.tok = tokAXor
+			} else {
+				c.tok = '^'
+			}
+			c.tokFlags = 0
 			return nil
 
 		case t == '/':
