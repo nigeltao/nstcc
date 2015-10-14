@@ -115,6 +115,109 @@ redoNoStart:
 			c.s = s
 			return nil
 
+		case t == '<':
+			c.s++
+			switch c.peekc() {
+			case '=':
+				c.s++
+				c.tok = tokLE
+			case '<':
+				c.s++
+				if c.peekc() == '=' {
+					c.s++
+					c.tok = tokAShL
+				} else {
+					c.tok = tokShL
+				}
+			default:
+				c.tok = tokLT
+			}
+			c.tokFlags = 0
+			return nil
+
+		case t == '>':
+			c.s++
+			switch c.peekc() {
+			case '=':
+				c.s++
+				c.tok = tokGE
+			case '>':
+				c.s++
+				if c.peekc() == '=' {
+					c.s++
+					c.tok = tokASAR
+				} else {
+					c.tok = tokSAR
+				}
+			default:
+				c.tok = tokGT
+			}
+			c.tokFlags = 0
+			return nil
+
+		case t == '&':
+			c.s++
+			switch c.peekc() {
+			case '&':
+				c.s++
+				c.tok = tokLAnd
+			case '=':
+				c.s++
+				c.tok = tokAAnd
+			default:
+				c.tok = '&'
+			}
+			c.tokFlags = 0
+			return nil
+
+		case t == '|':
+			c.s++
+			switch c.peekc() {
+			case '|':
+				c.s++
+				c.tok = tokLOr
+			case '=':
+				c.s++
+				c.tok = tokAOr
+			default:
+				c.tok = '|'
+			}
+			c.tokFlags = 0
+			return nil
+
+		case t == '+':
+			c.s++
+			switch c.peekc() {
+			case '+':
+				c.s++
+				c.tok = tokInc
+			case '=':
+				c.s++
+				c.tok = tokAAdd
+			default:
+				c.tok = '+'
+			}
+			c.tokFlags = 0
+			return nil
+
+		case t == '-':
+			c.s++
+			switch c.peekc() {
+			case '-':
+				c.s++
+				c.tok = tokDec
+			case '=':
+				c.s++
+				c.tok = tokASub
+			case '>':
+				c.s++
+				c.tok = tokArrow
+			default:
+				c.tok = '-'
+			}
+			c.tokFlags = 0
+			return nil
+
 		case t == '!':
 			c.s++
 			if c.peekc() == '=' {
