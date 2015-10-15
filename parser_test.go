@@ -6,63 +6,49 @@ import (
 )
 
 func TestParser(t *testing.T) {
-	// Map identifier strings like "main" to (negative) placeholder token
-	// values.
-	t2s := map[token]string{}
-	s2t := map[string]token{}
-	ident := func(s string) token {
-		x, ok := s2t[s]
-		if !ok {
-			x = token(^len(s2t))
-			s2t[s] = x
-			t2s[x] = s
-		}
-		return x
-	}
-
 	testCases := []struct {
 		desc string
 		src  string
-		want []token
+		want []interface{}
 	}{{
 		"hello world",
 		// TODO: s/XXX/42/
 		"int main(int argc, char** argv) { return XXX; }",
-		[]token{
+		[]interface{}{
 			tokInt,
-			ident("main"),
+			"main",
 			'(',
 			tokInt,
-			ident("argc"),
+			"argc",
 			',',
 			tokChar,
 			'*',
 			'*',
-			ident("argv"),
+			"argv",
 			')',
 			'{',
 			tokReturn,
-			ident("XXX"),
+			"XXX",
 			';',
 			'}',
 		},
 	}, {
 		"slash star",
 		"int /*foo*/ x;",
-		[]token{
+		[]interface{}{
 			tokInt,
-			ident("x"),
+			"x",
 			';',
 		},
 	}, {
 		"slash slash",
 		"int x;\n// int y;\nint z;\n",
-		[]token{
+		[]interface{}{
 			tokInt,
-			ident("x"),
+			"x",
 			';',
 			tokInt,
-			ident("z"),
+			"z",
 			';',
 		},
 	}}
@@ -80,20 +66,27 @@ func TestParser(t *testing.T) {
 			got = append(got, c.tok)
 		}
 
-		// Replace the placeholder identifier tokens with their real values.
+		// Replace the placeholder tokens with their real values.
+		want := make([]token, len(tc.want))
 		for i, x := range tc.want {
-			if x >= 0 {
-				continue
+			switch x := x.(type) {
+			case rune:
+				want[i] = token(x)
+			case string:
+				ts, err := c.idents.byStr([]byte(x))
+				if err != nil {
+					t.Fatal(err)
+				}
+				want[i] = ts.tok
+			case token:
+				want[i] = x
+			default:
+				t.Fatalf("invalid type %T", x)
 			}
-			ts, err := c.idents.byStr([]byte(t2s[x]))
-			if err != nil {
-				t.Fatal(err)
-			}
-			tc.want[i] = ts.tok
 		}
 
-		if !reflect.DeepEqual(got, tc.want) {
-			t.Fatalf("parsing %q:\ngot  %v\nwant %v", tc.desc, got, tc.want)
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("parsing %q:\ngot  %v\nwant %v", tc.desc, got, want)
 		}
 	}
 }
