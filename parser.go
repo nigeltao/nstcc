@@ -115,6 +115,10 @@ redoNoStart:
 			c.s = s
 			return nil
 
+		case t == '\'' || t == '"':
+			c.s++
+			return c.parseString(t, false)
+
 		case t == '<':
 			c.s++
 			switch c.peekc() {
@@ -314,6 +318,45 @@ func (c *compiler) peekc() token {
 	return token(c.src[c.s])
 }
 
+func (c *compiler) parseString(sep byte, isLong bool) error {
+	var str []byte
+loop:
+	for {
+		if c.s >= len(c.src) {
+			return errors.New("nstcc: unexpected end of file in string")
+		}
+		x := c.src[c.s]
+		switch x {
+		case sep:
+			c.s++
+			break loop
+		case '\\':
+			switch y := c.peekc(); y {
+			default:
+				c.s++
+				str = append(str, x, byte(y))
+			case tokEOF:
+				return errors.New("nstcc: unexpected end of file in string")
+			case '\n':
+				// TODO: file->line_num++
+				c.s++
+
+				// TODO: case '\r':
+			}
+			continue loop
+		case '\n':
+			// TODO: file->line_num++
+
+			// TODO: case '\r':
+			// Note that it says PEEKC_EOB instead of PEEKC.
+		}
+		c.s++
+		str = append(str, x)
+	}
+	println("got string", string(str)) // TODO
+	return nil
+}
+
 func (c *compiler) parseSlashStarComment() error {
 	star := false
 	for c.s < len(c.src) {
@@ -331,6 +374,7 @@ func (c *compiler) parseSlashStarComment() error {
 				return nil
 			}
 			star = false
+
 			// TODO: case '\\':
 		}
 	}

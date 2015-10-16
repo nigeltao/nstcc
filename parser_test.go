@@ -33,6 +33,15 @@ func TestParser(t *testing.T) {
 			'}',
 		},
 	}, {
+		"string",
+		`x = "abc";`,
+		[]interface{}{
+			"x",
+			'=',
+			// TODO: tokStr.
+			';',
+		},
+	}, {
 		"slash star",
 		"int /*foo*/ x;",
 		[]interface{}{

@@ -108,7 +108,7 @@ const (
 	tokStr       token = 0xb5
 	tokTwoSharps token = 0xb6
 	tokLChar     token = 0xb7
-	toklStr      token = 0xb8
+	tokLStr      token = 0xb8
 	tokCFloat    token = 0xb9
 	tokLineNum   token = 0xba
 	tokCDouble   token = 0xc0
