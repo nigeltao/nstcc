@@ -117,7 +117,16 @@ redoNoStart:
 
 		case t == '\'' || t == '"':
 			c.s++
-			return c.parseString(t, false)
+			str, err := c.parseString(t, false, false)
+			if err != nil {
+				return err
+			}
+			str, err = unescape(str)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("got %q\n", str) // TODO
+			return nil
 
 		case t == '<':
 			c.s++
@@ -318,25 +327,26 @@ func (c *compiler) peekc() token {
 	return token(c.src[c.s])
 }
 
-func (c *compiler) parseString(sep byte, isLong bool) error {
-	var str []byte
+func (c *compiler) parseString(sep byte, isLong bool, justSkip bool) (ret []byte, retErr error) {
 loop:
 	for {
 		if c.s >= len(c.src) {
-			return errors.New("nstcc: unexpected end of file in string")
+			return nil, errors.New("nstcc: unexpected end of file in string")
 		}
 		x := c.src[c.s]
+		c.s++
 		switch x {
 		case sep:
-			c.s++
 			break loop
 		case '\\':
 			switch y := c.peekc(); y {
 			default:
 				c.s++
-				str = append(str, x, byte(y))
+				if !justSkip {
+					ret = append(ret, x, byte(y))
+				}
 			case tokEOF:
-				return errors.New("nstcc: unexpected end of file in string")
+				return nil, errors.New("nstcc: unexpected end of file in string")
 			case '\n':
 				// TODO: file->line_num++
 				c.s++
@@ -350,11 +360,11 @@ loop:
 			// TODO: case '\r':
 			// Note that it says PEEKC_EOB instead of PEEKC.
 		}
-		c.s++
-		str = append(str, x)
+		if !justSkip {
+			ret = append(ret, x)
+		}
 	}
-	println("got string", string(str)) // TODO
-	return nil
+	return ret, nil
 }
 
 func (c *compiler) parseSlashStarComment() error {
@@ -391,4 +401,90 @@ func (c *compiler) parseSlashSlashComment() {
 			// TODO: case '\\':
 		}
 	}
+}
+
+func unescape(s []byte) ([]byte, error) {
+	j := 0
+	for i := 0; i < len(s); {
+		x := s[i]
+		if x != '\\' {
+			s[j] = x
+			i++
+			j++
+			continue
+		}
+		i++
+		if i == len(s) {
+			return nil, errors.New("nstcc: unexpected end of string after backslash")
+		}
+		x = s[i]
+		i++
+		switch x {
+		default:
+			return nil, fmt.Errorf(`nstcc: invalid escape sequence '\%c'`, x)
+		case '0', '1', '2', '3', '4', '5', '6', '7':
+			n := int(x) - '0'
+			if i < len(s) && isOctal(s[i]) {
+				n = 8*n + int(s[i]) - '0'
+				i++
+				if i < len(s) && isOctal(s[i]) {
+					n = 8*n + int(s[i]) - '0'
+					i++
+				}
+			}
+			s[j] = byte(n)
+			j++
+		case 'x': // TODO: 'u', 'U'.
+			// TODO: check that this is correct for something like "\xabc".
+			// Does "\x" imply at most two hex digits afterwards?
+			n := 0
+		loop:
+			for ; i < len(s); i++ {
+				switch x := s[i]; {
+				default:
+					break loop
+				case '0' <= x && x <= '9':
+					n = 16*n + int(x) - '0'
+				case 'A' <= x && x <= 'F':
+					n = 16*n + int(x) - ('A' - 10)
+				case 'a' <= x && x <= 'f':
+					n = 16*n + int(x) - ('a' - 10)
+				}
+			}
+			s[j] = byte(n)
+			j++
+		case 'a':
+			s[j] = '\a'
+			j++
+		case 'b':
+			s[j] = '\b'
+			j++
+		case 'f':
+			s[j] = '\f'
+			j++
+		case 'n':
+			s[j] = '\n'
+			j++
+		case 'r':
+			s[j] = '\r'
+			j++
+		case 't':
+			s[j] = '\t'
+			j++
+		case 'v':
+			s[j] = '\v'
+			j++
+		case 'e':
+			s[j] = '\x1b'
+			j++
+		case '\'', '"', '\\', '?':
+			s[j] = x
+			j++
+		}
+	}
+	return s[:j], nil
+}
+
+func isOctal(x byte) bool {
+	return '0' <= x && x <= '7'
 }
