@@ -24,6 +24,11 @@ const (
 	parseFlagSpaces      parseFlags = 0x10
 )
 
+type cValue struct {
+	i   int64
+	str []byte
+}
+
 type compiler struct {
 	ctx *Context
 	dst *bufio.Writer
@@ -32,8 +37,9 @@ type compiler struct {
 	tokFlags   tokFlags
 	parseFlags parseFlags
 
-	tok token
-	s   int
+	tok  token
+	tokc cValue
+	s    int
 
 	idents idents
 }

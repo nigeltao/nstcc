@@ -125,7 +125,18 @@ redoNoStart:
 			if err != nil {
 				return err
 			}
-			fmt.Printf("got %q\n", str) // TODO
+			if t == '\'' {
+				if len(str) == 0 {
+					return errors.New("nstcc: empty character constant")
+				} else if len(str) > 1 {
+					return errors.New("nstcc: multi-character character constant")
+				}
+				c.tok = tokCChar // TODO: map L'x' chars to tokLChar.
+				c.tokc.i = int64(str[0])
+			} else {
+				c.tok = tokStr // TODO: map L"xxx" strings to tokLStr.
+				c.tokc.str = str
+			}
 			return nil
 
 		case t == '<':

@@ -33,12 +33,21 @@ func TestParser(t *testing.T) {
 			'}',
 		},
 	}, {
+		"char",
+		`x = 'a';`,
+		[]interface{}{
+			"x",
+			'=',
+			tokCChar,
+			';',
+		},
+	}, {
 		"string",
 		`x = "abc";`,
 		[]interface{}{
 			"x",
 			'=',
-			// TODO: tokStr.
+			tokStr,
 			';',
 		},
 	}, {
@@ -62,12 +71,14 @@ func TestParser(t *testing.T) {
 		},
 	}}
 
+loop:
 	for _, tc := range testCases {
 		c := newCompiler(nil, nil, []byte(tc.src))
 		var got []token
 		for {
 			if err := c.next(); err != nil {
-				t.Fatal(err)
+				t.Errorf("parsing %q:\n%v", tc.desc, err)
+				continue loop
 			}
 			if c.tok == tokEOF {
 				break
@@ -84,13 +95,15 @@ func TestParser(t *testing.T) {
 			case string:
 				ts, err := c.idents.byStr([]byte(x))
 				if err != nil {
-					t.Fatal(err)
+					t.Errorf("parsing %q:\n%v", tc.desc, err)
+					continue loop
 				}
 				want[i] = ts.tok
 			case token:
 				want[i] = x
 			default:
-				t.Fatalf("invalid type %T", x)
+				t.Errorf("parsing %q:\ninvalid type %T", tc.desc, x)
+				continue loop
 			}
 		}
 
