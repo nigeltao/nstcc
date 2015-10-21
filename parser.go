@@ -115,6 +115,49 @@ redoNoStart:
 			c.s = s
 			return nil
 
+		case t == '.':
+			c.s++
+			switch c.peekc() {
+			default:
+				c.tok = '.'
+				c.tokFlags = 0
+				return nil
+			case '.':
+				c.s++
+				if c.peekc() != '.' {
+					return errors.New(`nstcc: incomplete "..." token`)
+				}
+				c.s++
+				c.tok = tokDots
+				c.tokFlags = 0
+				return nil
+			case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+				// No-op, and fall through below.
+			}
+			c.s--
+			fallthrough
+
+		case isNum[t]:
+			s := c.s + 1
+			for ; s < len(c.src); s++ {
+				x := c.src[s]
+				if isNum[x] || isID[x] || x == '.' {
+					continue
+				}
+				if x == '-' || x == '+' {
+					switch c.src[s-1] {
+					case 'E', 'P', 'e', 'p':
+						continue
+					}
+				}
+				break
+			}
+			c.tok = tokPPNum
+			c.tokc.str = c.src[c.s:s]
+			c.tokFlags = 0
+			c.s = s
+			return nil
+
 		case t == '\'' || t == '"':
 			c.s++
 			str, err := c.parseString(t, false, false)

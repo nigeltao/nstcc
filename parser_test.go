@@ -12,8 +12,7 @@ func TestParser(t *testing.T) {
 		want []interface{}
 	}{{
 		"hello world",
-		// TODO: s/XXX/42/
-		"int main(int argc, char** argv) { return XXX; }",
+		"int main(int argc, char** argv) { return 42; }",
 		[]interface{}{
 			tokInt,
 			"main",
@@ -28,7 +27,7 @@ func TestParser(t *testing.T) {
 			')',
 			'{',
 			tokReturn,
-			"XXX",
+			tokPPNum, // TODO: tokCInt.
 			';',
 			'}',
 		},
@@ -67,6 +66,22 @@ func TestParser(t *testing.T) {
 			';',
 			tokInt,
 			"z",
+			';',
+		},
+	}, {
+		"dot dot dot",
+		"int printf(const char* format, ...);",
+		[]interface{}{
+			tokInt,
+			"printf",
+			'(',
+			"const", // TODO: make this tokConst1.
+			tokChar,
+			'*',
+			"format",
+			',',
+			tokDots,
+			')',
 			';',
 		},
 	}}
