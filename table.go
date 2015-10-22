@@ -3,45 +3,171 @@
 package nstcc
 
 const (
-	tokInt      = tokIdent + 0  // int
-	tokVoid     = tokIdent + 1  // void
-	tokChar     = tokIdent + 2  // char
-	tokIf       = tokIdent + 3  // if
-	tokElse     = tokIdent + 4  // else
-	tokWhile    = tokIdent + 5  // while
-	tokBreak    = tokIdent + 6  // break
-	tokReturn   = tokIdent + 7  // return
-	tokFor      = tokIdent + 8  // for
-	tokExtern   = tokIdent + 9  // extern
-	tokStatic   = tokIdent + 10 // static
-	tokUnsigned = tokIdent + 11 // unsigned
-	tokGoto     = tokIdent + 12 // goto
-	tokDo       = tokIdent + 13 // do
-	tokContinue = tokIdent + 14 // continue
-	tokSwitch   = tokIdent + 15 // switch
-	tokCase     = tokIdent + 16 // case
+	tokInt          = tokIdent + 0  // int
+	tokVoid         = tokIdent + 1  // void
+	tokChar         = tokIdent + 2  // char
+	tokIf           = tokIdent + 3  // if
+	tokElse         = tokIdent + 4  // else
+	tokWhile        = tokIdent + 5  // while
+	tokBreak        = tokIdent + 6  // break
+	tokReturn       = tokIdent + 7  // return
+	tokFor          = tokIdent + 8  // for
+	tokExtern       = tokIdent + 9  // extern
+	tokStatic       = tokIdent + 10 // static
+	tokUnsigned     = tokIdent + 11 // unsigned
+	tokGoto         = tokIdent + 12 // goto
+	tokDo           = tokIdent + 13 // do
+	tokContinue     = tokIdent + 14 // continue
+	tokSwitch       = tokIdent + 15 // switch
+	tokCase         = tokIdent + 16 // case
+	tokConst1       = tokIdent + 17 // const
+	tokConst2       = tokIdent + 18 // __const
+	tokConst3       = tokIdent + 19 // __const__
+	tokVolatile1    = tokIdent + 20 // volatile
+	tokVolatile2    = tokIdent + 21 // __volatile
+	tokVolatile3    = tokIdent + 22 // __volatile__
+	tokLong         = tokIdent + 23 // long
+	tokRegister     = tokIdent + 24 // register
+	tokSigned1      = tokIdent + 25 // signed
+	tokSigned2      = tokIdent + 26 // __signed
+	tokSigned3      = tokIdent + 27 // __signed__
+	tokAuto         = tokIdent + 28 // auto
+	tokInline1      = tokIdent + 29 // inline
+	tokInline2      = tokIdent + 30 // __inline
+	tokInline3      = tokIdent + 31 // __inline__
+	tokRestrict1    = tokIdent + 32 // restrict
+	tokRestrict2    = tokIdent + 33 // __restrict
+	tokRestrict3    = tokIdent + 34 // __restrict__
+	tokExtension    = tokIdent + 35 // __extension__
+	tokFloat        = tokIdent + 36 // float
+	tokDouble       = tokIdent + 37 // double
+	tokBool         = tokIdent + 38 // _Bool
+	tokShort        = tokIdent + 39 // short
+	tokStruct       = tokIdent + 40 // struct
+	tokUnion        = tokIdent + 41 // union
+	tokTypedef      = tokIdent + 42 // typedef
+	tokDefault      = tokIdent + 43 // default
+	tokEnum         = tokIdent + 44 // enum
+	tokSizeof       = tokIdent + 45 // sizeof
+	tokAttribute1   = tokIdent + 46 // __attribute
+	tokAttribute2   = tokIdent + 47 // __attribute__
+	tokAlignOf1     = tokIdent + 48 // __alignof
+	tokAlignOf2     = tokIdent + 49 // __alignof__
+	tokTypeOf1      = tokIdent + 50 // typeof
+	tokTypeOf2      = tokIdent + 51 // __typeof
+	tokTypeOf3      = tokIdent + 52 // __typeof__
+	tokLabel        = tokIdent + 53 // __label__
+	tokAsm1         = tokIdent + 54 // asm
+	tokAsm2         = tokIdent + 55 // __asm
+	tokAsm3         = tokIdent + 56 // __asm__
+	tokDefine       = tokIdent + 57 // define
+	tokInclude      = tokIdent + 58 // include
+	tokIncludeNext  = tokIdent + 59 // include_next
+	tokIfDef        = tokIdent + 60 // ifdef
+	tokIfNDef       = tokIdent + 61 // ifndef
+	tokElIf         = tokIdent + 62 // elif
+	tokEndIf        = tokIdent + 63 // endif
+	tokDefined      = tokIdent + 64 // defined
+	tokUndef        = tokIdent + 65 // undef
+	tokError        = tokIdent + 66 // error
+	tokWarning      = tokIdent + 67 // warning
+	tokLine         = tokIdent + 68 // line
+	tokPragma       = tokIdent + 69 // pragma
+	tok__LINE__     = tokIdent + 70 // __LINE__
+	tok__FILE__     = tokIdent + 71 // __FILE__
+	tok__DATE__     = tokIdent + 72 // __DATE__
+	tok__TIME__     = tokIdent + 73 // __TIME__
+	tok__FUNCTION__ = tokIdent + 74 // __FUNCTION__
+	tok__VA_ARGS__  = tokIdent + 75 // __VA_ARGS__
+	tok__func__     = tokIdent + 76 // __func__
+	tok__nan__      = tokIdent + 77 // __nan__
+	tok__snan__     = tokIdent + 78 // __snan__
+	tok__inf__      = tokIdent + 79 // __inf__
 )
 
-var builtInTokensStrings = []byte("intvoidcharifelsewhilebreakreturnforexternstaticunsignedgotodocontinueswitchcase")
+var builtInTokensStrings = []byte("intvoidcharifelsewhilebreakreturnforexternstaticunsignedgotodocontinueswitchcaseconst__const__const__volatile__volatile__volatile__longregistersigned__signed__signed__autoinline__inline__inline__restrict__restrict__restrict____extension__floatdouble_Boolshortstructuniontypedefdefaultenumsizeof__attribute__attribute____alignof__alignof__typeof__typeof__typeof____label__asm__asm__asm__defineincludeinclude_nextifdefifndefelifendifdefinedundeferrorwarninglinepragma__LINE____FILE____DATE____TIME____FUNCTION____VA_ARGS____func____nan____snan____inf__")
 
 var builtInTokensLengths = [...]uint32{
-	3,  // int
-	7,  // void
-	11, // char
-	13, // if
-	17, // else
-	22, // while
-	27, // break
-	33, // return
-	36, // for
-	42, // extern
-	48, // static
-	56, // unsigned
-	60, // goto
-	62, // do
-	70, // continue
-	76, // switch
-	80, // case
+	3,   // int
+	7,   // void
+	11,  // char
+	13,  // if
+	17,  // else
+	22,  // while
+	27,  // break
+	33,  // return
+	36,  // for
+	42,  // extern
+	48,  // static
+	56,  // unsigned
+	60,  // goto
+	62,  // do
+	70,  // continue
+	76,  // switch
+	80,  // case
+	85,  // const
+	92,  // __const
+	101, // __const__
+	109, // volatile
+	119, // __volatile
+	131, // __volatile__
+	135, // long
+	143, // register
+	149, // signed
+	157, // __signed
+	167, // __signed__
+	171, // auto
+	177, // inline
+	185, // __inline
+	195, // __inline__
+	203, // restrict
+	213, // __restrict
+	225, // __restrict__
+	238, // __extension__
+	243, // float
+	249, // double
+	254, // _Bool
+	259, // short
+	265, // struct
+	270, // union
+	277, // typedef
+	284, // default
+	288, // enum
+	294, // sizeof
+	305, // __attribute
+	318, // __attribute__
+	327, // __alignof
+	338, // __alignof__
+	344, // typeof
+	352, // __typeof
+	362, // __typeof__
+	371, // __label__
+	374, // asm
+	379, // __asm
+	386, // __asm__
+	392, // define
+	399, // include
+	411, // include_next
+	416, // ifdef
+	422, // ifndef
+	426, // elif
+	431, // endif
+	438, // defined
+	443, // undef
+	448, // error
+	455, // warning
+	459, // line
+	465, // pragma
+	473, // __LINE__
+	481, // __FILE__
+	489, // __DATE__
+	497, // __TIME__
+	509, // __FUNCTION__
+	520, // __VA_ARGS__
+	528, // __func__
+	535, // __nan__
+	543, // __snan__
+	550, // __inf__
 }
 
 var isID = [256]bool{
