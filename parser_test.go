@@ -75,7 +75,7 @@ func TestParser(t *testing.T) {
 			tokInt,
 			"printf",
 			'(',
-			"const", // TODO: make this tokConst1.
+			tokConst1,
 			tokChar,
 			'*',
 			"format",
