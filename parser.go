@@ -28,9 +28,8 @@ func (c *compiler) next() error {
 		}
 
 		if c.tok == tokPPNum && c.parseFlags&parseFlagTokNum != 0 {
-			// TODO: convert preprocessor tokens into C tokens.
+			return c.parseNumber(c.tokc.str)
 		}
-
 		return nil
 	}
 }
@@ -175,7 +174,7 @@ redoNoStart:
 					return errors.New("nstcc: multi-character character constant")
 				}
 				c.tok = tokCChar // TODO: map L'x' chars to tokLChar.
-				c.tokc.i = int64(str[0])
+				c.tokc.int = int64(str[0])
 			} else {
 				c.tok = tokStr // TODO: map L"xxx" strings to tokLStr.
 				c.tokc.str = str
@@ -541,4 +540,86 @@ func unescape(s []byte) ([]byte, error) {
 
 func isOctal(x byte) bool {
 	return '0' <= x && x <= '7'
+}
+
+func (c *compiler) parseNumber(s []byte) error {
+	base := 10
+	if s[0] == '.' {
+		// TODO: goto float_frac_parse.
+	}
+	if s[0] == '0' && len(s) > 1 {
+		switch s[1] {
+		case 'B', 'b':
+			base = 2
+			s = s[2:]
+		case 'X', 'x':
+			base = 16
+			s = s[2:]
+		}
+	}
+
+	i := 0
+	for ; i < len(s); i++ {
+		x := s[i]
+		switch {
+		case '0' <= x && x <= '9':
+			x -= '0'
+		case 'A' <= x && x <= 'F':
+			x -= 'A' - 10
+		case 'a' <= x && x <= 'f':
+			x -= 'a' - 10
+		}
+		if int(x) >= base {
+			break
+		}
+	}
+
+	if i < len(s) {
+		x := s[i]
+		if x == '.' ||
+			((x == 'E' || x == 'e') && (base == 10)) ||
+			((x == 'P' || x == 'p') && (base == 16 || base == 2)) {
+
+			return fmt.Errorf("nstcc: TODO: parse floating point numbers")
+		}
+	}
+
+	if base == 10 && s[0] == '0' {
+		base = 8
+		s = s[1:]
+		i--
+	}
+
+	n := int64(0)
+	for _, x := range s[:i] {
+		switch {
+		case '0' <= x && x <= '9':
+			x -= '0'
+		case 'A' <= x && x <= 'F':
+			x -= 'A' - 10
+		case 'a' <= x && x <= 'f':
+			x -= 'a' - 10
+		}
+		if int(x) >= base {
+			return fmt.Errorf("nstcc: invalid number")
+		}
+		n = n*int64(base) + int64(x)
+		// TODO: detect overflow.
+	}
+
+	// TODO: recognize tokCULLong and tokCLLong.
+	if n > 0x7fffffff {
+		c.tok = tokCUint
+	} else {
+		c.tok = tokCInt
+	}
+
+	if i != len(s) {
+		// TODO: deal with trailing Us and Ls in s[:i], such as in parsing
+		// "123ULL". Note that floating point constants don't have Us and Ls.
+		return fmt.Errorf("nstcc: invalid number")
+	}
+
+	c.tokc.int = n
+	return nil
 }

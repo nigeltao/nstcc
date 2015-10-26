@@ -27,7 +27,7 @@ func TestParser(t *testing.T) {
 			')',
 			'{',
 			tokReturn,
-			tokPPNum, // TODO: tokCInt.
+			tokCInt,
 			';',
 			'}',
 		},
@@ -89,6 +89,7 @@ func TestParser(t *testing.T) {
 loop:
 	for _, tc := range testCases {
 		c := newCompiler(nil, nil, []byte(tc.src))
+		c.parseFlags = parseFlagTokNum
 		var got []token
 		for {
 			if err := c.next(); err != nil {

@@ -25,7 +25,7 @@ const (
 )
 
 type cValue struct {
-	i   int64
+	int int64
 	str []byte
 }
 
