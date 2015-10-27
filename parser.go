@@ -74,18 +74,30 @@ redoNoStart:
 		case t == '\\':
 			// TODO.
 
-		case t == '\n':
-			// TODO: file->line_num++
-			c.tokFlags |= tokFlagBOL
+		case t == '\n' || t == '#':
 			c.s++
+			if t == '\n' {
+				// TODO: file->line_num++
+				c.tokFlags |= tokFlagBOL
+			} else if c.tokFlags&tokFlagBOL == 0 || c.parseFlags&parseFlagPreprocess == 0 {
+				if c.peekc() == '#' {
+					c.s++
+					c.tok = tokTwoSharps
+				} else if false {
+					// TODO: parseFlagAsmComments.
+				} else {
+					c.tok = '#'
+				}
+				c.tokFlags = 0
+				return nil
+			} else if err := c.preprocess(c.tokFlags&tokFlagBOF != 0); err != nil {
+				return err
+			}
 			if c.parseFlags&parseFlagLineFeed == 0 {
 				continue redoNoStart
 			}
 			c.tok = '\n'
 			return nil
-
-		case t == '#':
-			// TODO.
 
 		case t == 'L':
 			// TODO: parse things like the wchar_t L"abc".
@@ -378,6 +390,11 @@ func (c *compiler) peekc() token {
 	}
 	// TODO: handle c == '\\'.
 	return token(c.src[c.s])
+}
+
+func (c *compiler) preprocess(isBOF bool) error {
+	// TODO: save/restore c.src and c.s as file->buf_ptr.
+	return nil
 }
 
 func (c *compiler) parseString(sep byte, isLong bool, justSkip bool) (ret []byte, retErr error) {
