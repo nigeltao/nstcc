@@ -394,6 +394,51 @@ func (c *compiler) peekc() token {
 
 func (c *compiler) preprocess(isBOF bool) error {
 	// TODO: save/restore c.src and c.s as file->buf_ptr.
+
+	savedParseFlags := c.parseFlags
+	c.parseFlags = parseFlagPreprocess | parseFlagTokNum | parseFlagLineFeed
+	defer func() {
+		c.parseFlags = savedParseFlags
+	}()
+
+	if err := c.nextNoMacro(); err != nil {
+		return err
+	}
+
+redo:
+	for {
+		switch c.tok {
+		case tokDefine:
+			if err := c.nextNoMacro(); err != nil {
+				return err
+			}
+			if err := c.parseDefine(); err != nil {
+				return err
+			}
+
+			// TODO: other cases.
+		}
+
+		break redo
+	}
+
+	for c.tok != '\n' {
+		if c.tok == tokEOF {
+			return errors.New("nstcc: unexpected end of file")
+		}
+		if err := c.nextNoMacro(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *compiler) parseDefine() error {
+	name := c.tok
+	if name < tokIdent {
+		return errors.New("nstcc: invalid macro name")
+	}
+	// TODO.
 	return nil
 }
 
