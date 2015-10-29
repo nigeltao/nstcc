@@ -438,6 +438,28 @@ func (c *compiler) parseDefine() error {
 	if name < tokIdent {
 		return errors.New("nstcc: invalid macro name")
 	}
+
+	if err := c.nextNoMacroSpace(); err != nil {
+		return err
+	}
+	typ, tokStr, first := macroObj, []int32(nil), (*sym)(nil)
+	if c.tok == '(' {
+		// TODO.
+		typ = macroFunc
+	}
+
+	for c.tok != '\n' && c.tok != tokEOF {
+		// TODO: remove spaces around ## and after '#'.
+		// TODO: tok_str_add2(&str, tok, &tokc);
+		if err := c.nextNoMacroSpace(); err != nil {
+			return err
+		}
+	}
+	// TODO.
+	return c.definePush(name, typ, tokStr, first)
+}
+
+func (c *compiler) definePush(name token, typ macroType, tokStr []int32, first *sym) error {
 	// TODO.
 	return nil
 }

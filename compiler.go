@@ -5,6 +5,13 @@ import (
 	"io"
 )
 
+type macroType uint32
+
+const (
+	macroObj  macroType = 0
+	macroFunc macroType = 1
+)
+
 type tokFlags uint32
 
 const (
