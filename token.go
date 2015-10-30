@@ -72,6 +72,22 @@ func (m *idents) alloc(p **tokenSym, s []byte) (*tokenSym, error) {
 	return y, nil
 }
 
+func (m *idents) defineFind(t token) *sym {
+	t -= tokIdent
+	if t < 0 || len(m.list) <= int(t) {
+		return nil
+	}
+	return m.list[t].symDefine
+}
+
+func (m *idents) defineUndef(s *sym) {
+	t := s.tok - tokIdent
+	if 0 <= t && int(t) < len(m.list) {
+		m.list[t].symDefine = nil
+	}
+	s.tok = 0
+}
+
 type token int32
 
 func (t token) isSpace() bool {

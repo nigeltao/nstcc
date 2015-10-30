@@ -27,7 +27,12 @@ func Preprocess(ctx *Context, dst io.Writer, src []byte) error {
 
 type tokenSym struct {
 	hashNext *tokenSym
-	// TODO: symThis, symThat.
+
+	symDefine     *sym
+	symLabel      *sym
+	symStruct     *sym
+	symIdentifier *sym
+
 	tok token
 	str []byte
 }
@@ -35,5 +40,14 @@ type tokenSym struct {
 const symFirstAnom = 0x10000000 // First anonymous sym.
 
 type sym struct {
-	// TODO.
+	tok token
+	// TODO: asmLabel []byte
+	// TODO: r for register.
+	// TODO: c for associated number.
+	// TODO: d for token stream.
+	// TODO: cType.
+	// TODO: jnext for jump-next.
+	next      *sym
+	stackPrev *sym
+	tokPrev   *sym
 }
