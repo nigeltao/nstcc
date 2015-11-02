@@ -94,6 +94,11 @@ func (t token) isSpace() bool {
 	return t == ' ' || t == '\t' || t == '\v' || t == '\f' || t == '\r'
 }
 
+type tokenValue struct {
+	tok  token
+	tokc cValue
+}
+
 const (
 	tokEOF token = -1
 

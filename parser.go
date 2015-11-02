@@ -3,6 +3,7 @@ package nstcc
 import (
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 func (c *compiler) next() error {
@@ -442,7 +443,7 @@ func (c *compiler) parseDefine() error {
 	if err := c.nextNoMacroSpace(); err != nil {
 		return err
 	}
-	typ, tokStr, first := macroObj, []int32(nil), (*sym)(nil)
+	typ, tokStr, first := macroObj, []tokenValue(nil), (*sym)(nil)
 	if c.tok == '(' {
 		// TODO.
 		typ = macroFunc
@@ -450,7 +451,7 @@ func (c *compiler) parseDefine() error {
 
 	for c.tok != '\n' && c.tok != tokEOF {
 		// TODO: remove spaces around ## and after '#'.
-		// TODO: tok_str_add2(&str, tok, &tokc);
+		tokStr = append(tokStr, tokenValue{tok:c.tok, tokc: c.tokc})
 		if err := c.nextNoMacroSpace(); err != nil {
 			return err
 		}
@@ -459,8 +460,15 @@ func (c *compiler) parseDefine() error {
 	return c.definePush(name, typ, tokStr, first)
 }
 
-func (c *compiler) definePush(name token, typ macroType, tokStr []int32, first *sym) error {
-	// TODO.
+func (c *compiler) definePush(name token, typ macroType, tokStr []tokenValue, first *sym) error {
+	s := c.idents.defineFind(name)
+	if s != nil && !reflect.DeepEqual(s.defineTokStr, tokStr) {
+		return fmt.Errorf("nstcc: %q redfined", c.idents.byTok(name).str)
+	}
+	// TODO: s = sym_push2(&define_stack, v, macro_type, 0);
+	s.defineTokStr = tokStr
+	s.next = first
+	c.idents.byTok(name).symDefine = s
 	return nil
 }
 

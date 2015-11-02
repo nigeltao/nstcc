@@ -44,7 +44,7 @@ type sym struct {
 	// TODO: asmLabel []byte
 	// TODO: r for register.
 	// TODO: c for associated number.
-	// TODO: d for token stream.
+	defineTokStr []tokenValue
 	// TODO: cType.
 	// TODO: jnext for jump-next.
 	next      *sym
