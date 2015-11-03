@@ -31,6 +31,11 @@ const (
 	parseFlagSpaces      parseFlags = 0x10
 )
 
+type cType struct {
+	typ macroType // TODO: s/macroType/token/?
+	sym *sym
+}
+
 type cValue struct {
 	int int64
 	str []byte
@@ -47,6 +52,12 @@ type compiler struct {
 	tok  token
 	tokc cValue
 	s    int
+
+	globalStack      *sym
+	localStack       *sym
+	localLabelStack  *sym
+	globalLabelStack *sym
+	defineStack      *sym
 
 	idents idents
 }

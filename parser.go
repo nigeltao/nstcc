@@ -465,7 +465,7 @@ func (c *compiler) definePush(name token, typ macroType, tokStr []tokenValue, fi
 	if s != nil && !reflect.DeepEqual(s.defineTokStr, tokStr) {
 		return fmt.Errorf("nstcc: %q redfined", c.idents.byTok(name).str)
 	}
-	// TODO: s = sym_push2(&define_stack, v, macro_type, 0);
+	s = c.symPush2(&c.defineStack, name, typ, 0)
 	s.defineTokStr = tokStr
 	s.next = first
 	c.idents.byTok(name).symDefine = s

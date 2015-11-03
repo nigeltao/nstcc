@@ -43,11 +43,27 @@ type sym struct {
 	tok token
 	// TODO: asmLabel []byte
 	// TODO: r for register.
-	// TODO: c for associated number.
+	c            int32 // TODO: int64?
 	defineTokStr []tokenValue
-	// TODO: cType.
+	cType        cType
 	// TODO: jnext for jump-next.
 	next      *sym
 	stackPrev *sym
 	tokPrev   *sym
+}
+
+func (c *compiler) symPush2(ps **sym, tok token, typ macroType, cc int32) *sym {
+	if ps == &c.localStack {
+		// TODO: look for incompatible types for redefinition.
+	}
+	s := &sym{
+		tok: tok,
+		cType: cType{
+			typ: typ,
+		},
+		c:         cc,
+		stackPrev: *ps,
+	}
+	*ps = s
+	return s
 }
