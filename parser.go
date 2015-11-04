@@ -18,21 +18,32 @@ func (c *compiler) next() error {
 			}
 		}
 
-		if true { // TODO: the TCC code says "if (!macro_ptr)".
-			if c.tok >= tokIdent && c.parseFlags&parseFlagPreprocess != 0 {
-				// TODO: if not reading from macro substituted string, then try
-				// to substitute macros.
+		if c.macroPtr == nil {
+			if c.tok < tokIdent || c.parseFlags&parseFlagPreprocess == 0 {
+				break
 			}
-
-		} else {
-			// TODO: macro_ptr code path.
+			s := c.idents.defineFind(c.tok)
+			if s == nil {
+				break
+			}
+			if false { // TODO: macro_subst_tok(etc) != 0.
+				break
+			}
+			// TODO: c.macroPtr = etc
+		} else if c.tok == tokEOM {
+			if false { // TODO: unget buffer.
+			} else {
+				c.macroPtr = nil
+			}
+		} else if c.tok != tokNoSubst {
+			break
 		}
-
-		if c.tok == tokPPNum && c.parseFlags&parseFlagTokNum != 0 {
-			return c.parseNumber(c.tokc.str)
-		}
-		return nil
 	}
+
+	if c.tok == tokPPNum && c.parseFlags&parseFlagTokNum != 0 {
+		return c.parseNumber(c.tokc.str)
+	}
+	return nil
 }
 
 func (c *compiler) nextNoMacro() error {
@@ -451,7 +462,7 @@ func (c *compiler) parseDefine() error {
 
 	for c.tok != '\n' && c.tok != tokEOF {
 		// TODO: remove spaces around ## and after '#'.
-		tokStr = append(tokStr, tokenValue{tok:c.tok, tokc: c.tokc})
+		tokStr = append(tokStr, tokenValue{tok: c.tok, tokc: c.tokc})
 		if err := c.nextNoMacroSpace(); err != nil {
 			return err
 		}

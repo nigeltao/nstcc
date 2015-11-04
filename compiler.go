@@ -44,14 +44,18 @@ type cValue struct {
 type compiler struct {
 	ctx *Context
 	dst *bufio.Writer
+
 	src []byte
+	s   int
+
+	macroPtr []tokenValue
+	m        int
 
 	tokFlags   tokFlags
 	parseFlags parseFlags
 
 	tok  token
 	tokc cValue
-	s    int
 
 	globalStack      *sym
 	localStack       *sym

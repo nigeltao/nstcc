@@ -100,7 +100,8 @@ type tokenValue struct {
 }
 
 const (
-	tokEOF token = -1
+	tokEOF token = -1 // End Of File.
+	tokEOM token = -2 // End Of Macro.
 
 	tokULT    token = 0x92
 	tokUGE    token = 0x93
