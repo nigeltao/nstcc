@@ -99,6 +99,16 @@ type tokenValue struct {
 	tokc cValue
 }
 
+type tokenString struct {
+	tokStr      []tokenValue
+	lastLineNum int
+}
+
+type macroLevel struct {
+	prev   *macroLevel
+	tokStr []tokenValue
+}
+
 const (
 	tokEOF token = -1 // End Of File.
 	tokEOM token = -2 // End Of Macro.

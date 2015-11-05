@@ -26,10 +26,11 @@ func (c *compiler) next() error {
 			if s == nil {
 				break
 			}
-			if false { // TODO: macro_subst_tok(etc) != 0.
+			ts, nestedList, ml := tokenString{}, (*sym)(nil), (*macroLevel)(nil)
+			if c.macroSubstTok(&ts, &nestedList, s, &ml) == macroSubstTokNoSubstitute {
 				break
 			}
-			// TODO: c.macroPtr = etc
+			c.macroPtr = ts.tokStr
 		} else if c.tok == tokEOM {
 			if false { // TODO: unget buffer.
 			} else {
@@ -443,6 +444,18 @@ redo:
 		}
 	}
 	return nil
+}
+
+type macroSubstTokResult bool
+
+const (
+	macroSubstTokSubstitute   macroSubstTokResult = false
+	macroSubstTokNoSubstitute macroSubstTokResult = true
+)
+
+func (c *compiler) macroSubstTok(ts *tokenString, nestedList **sym, s *sym, canReadStream **macroLevel) macroSubstTokResult {
+	// TODO.
+	return macroSubstTokSubstitute
 }
 
 func (c *compiler) parseDefine() error {
