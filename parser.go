@@ -455,7 +455,28 @@ const (
 
 func (c *compiler) macroSubstTok(ts *tokenString, nestedList **sym, s *sym, canReadStream **macroLevel) macroSubstTokResult {
 	// TODO.
+	switch c.tok {
+	case tok__LINE__:
+		// TODO.
+	case tok__FILE__:
+		// TODO.
+	case tok__DATE__, tok__TIME__:
+		// TODO.
+	default:
+		mStr := s.defineTokStr
+		if s.cType.typ == macroFunc {
+			// TODO.
+		}
+
+		c.symPush2(nestedList, s.tok, 0, 0)
+		c.macroSubst(ts, nestedList, mStr, canReadStream)
+		*nestedList = (*nestedList).stackPrev
+	}
 	return macroSubstTokSubstitute
+}
+
+func (c *compiler) macroSubst(ts *tokenString, nestedList **sym, mStr []tokenValue, canReadStream **macroLevel) {
+	// TODO.
 }
 
 func (c *compiler) parseDefine() error {
