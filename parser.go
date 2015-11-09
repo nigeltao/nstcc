@@ -476,7 +476,40 @@ func (c *compiler) macroSubstTok(ts *tokenString, nestedList **sym, s *sym, canR
 }
 
 func (c *compiler) macroSubst(ts *tokenString, nestedList **sym, mStr []tokenValue, canReadStream **macroLevel) {
+	// TODO: handle two-sharps.
+	spc, forceBlank := false, false
+	for m := mStr; len(m) > 0; {
+		tv := m[0]
+		m = m[1:]
+		if tv.tok == tokNoSubst {
+			ts.tokStr = append(ts.tokStr, tv)
+			tv = m[0]
+			m = m[1:]
+		} else if s := c.idents.defineFind(tv.tok); s != nil {
+			if !symFind2(nestedList, tv.tok) {
+				// TODO.
+				continue
+			}
+			ts.tokStr = append(ts.tokStr, tokenValue{tok: tokNoSubst})
+		}
+		if forceBlank {
+			ts.tokStr = append(ts.tokStr, tokenValue{tok: ' '})
+			spc, forceBlank = true, false
+			if !checkSpace(tv.tok, &spc) {
+				ts.tokStr = append(ts.tokStr, tv)
+			}
+		}
+	}
+}
+
+func symFind2(nestedList **sym, t token) bool {
 	// TODO.
+	return false
+}
+
+func checkSpace(t token, spc *bool) bool {
+	// TODO.
+	return false
 }
 
 func (c *compiler) parseDefine() error {
