@@ -512,7 +512,14 @@ func symFind2(s *sym, t token) *sym {
 }
 
 func checkSpace(t token, spc *bool) bool {
-	// TODO.
+	if t.isSpace() {
+		if *spc {
+			return true
+		}
+		*spc = true
+	} else {
+		*spc = false
+	}
 	return false
 }
 
