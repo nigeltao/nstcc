@@ -486,7 +486,7 @@ func (c *compiler) macroSubst(ts *tokenString, nestedList **sym, mStr []tokenVal
 			tv = m[0]
 			m = m[1:]
 		} else if s := c.idents.defineFind(tv.tok); s != nil {
-			if !symFind2(nestedList, tv.tok) {
+			if symFind2(*nestedList, tv.tok) == nil {
 				// TODO.
 				continue
 			}
@@ -502,9 +502,13 @@ func (c *compiler) macroSubst(ts *tokenString, nestedList **sym, mStr []tokenVal
 	}
 }
 
-func symFind2(nestedList **sym, t token) bool {
-	// TODO.
-	return false
+func symFind2(s *sym, t token) *sym {
+	for ; s != nil; s = s.stackPrev {
+		if s.tok == t {
+			return s
+		}
+	}
+	return nil
 }
 
 func checkSpace(t token, spc *bool) bool {
