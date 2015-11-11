@@ -486,12 +486,31 @@ func (c *compiler) macroSubst(ts *tokenString, nestedList **sym, mStr []tokenVal
 			tv = m[0]
 			m = m[1:]
 		} else if s := c.idents.defineFind(tv.tok); s != nil {
-			if symFind2(*nestedList, tv.tok) == nil {
-				// TODO.
-				continue
+			if symFind2(*nestedList, tv.tok) != nil {
+				ts.tokStr = append(ts.tokStr, tokenValue{tok: tokNoSubst})
+			} else {
+				ml := macroLevel{tokStr: c.macroPtr}
+				if canReadStream != nil {
+					ml.prev = *canReadStream
+					*canReadStream = &ml
+				}
+				c.macroPtr = m
+				c.tok = tv.tok
+				ret := c.macroSubstTok(ts, nestedList, s, canReadStream)
+				m = c.macroPtr
+				c.macroPtr = ml.tokStr
+				if canReadStream != nil && *canReadStream == &ml {
+					*canReadStream = ml.prev
+				}
+				if ret == macroSubstTokSubstitute {
+					if c.parseFlags&parseFlagSpaces != 0 {
+						forceBlank = true
+					}
+					continue
+				}
 			}
-			ts.tokStr = append(ts.tokStr, tokenValue{tok: tokNoSubst})
 		}
+
 		if forceBlank {
 			ts.tokStr = append(ts.tokStr, tokenValue{tok: ' '})
 			spc, forceBlank = true, false
