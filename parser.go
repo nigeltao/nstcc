@@ -564,7 +564,8 @@ func (c *compiler) parseDefine() error {
 			return err
 		}
 	}
-	// TODO.
+	// TODO: strip trailing space.
+	tokStr = append(tokStr, tokenValue{tok: tokEOM})
 	return c.definePush(name, typ, tokStr, first)
 }
 
