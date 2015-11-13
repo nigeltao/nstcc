@@ -84,12 +84,21 @@ func TestParser(t *testing.T) {
 			')',
 			';',
 		},
+	}, {
+		"define",
+		"#define foo bar\n\nx = foo;",
+		[]interface{}{
+			"x",
+			'=',
+			"bar",
+			';',
+		},
 	}}
 
 loop:
 	for _, tc := range testCases {
 		c := newCompiler(nil, nil, []byte(tc.src))
-		c.parseFlags = parseFlagTokNum
+		c.parseFlags = parseFlagPreprocess | parseFlagTokNum
 		var got []token
 		for {
 			if err := c.next(); err != nil {

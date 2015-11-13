@@ -59,8 +59,19 @@ func (c *compiler) nextNoMacro() error {
 }
 
 func (c *compiler) nextNoMacroSpace() error {
-	// TODO: check what the TCC code calls macro_ptr.
-	return c.nextNoMacro1()
+	if c.macroPtr == nil {
+		return c.nextNoMacro1()
+	}
+	for {
+		tv := c.macroPtr[0]
+		c.macroPtr = c.macroPtr[1:]
+		c.tok = tv.tok
+		c.tokc = tv.tokc
+		if c.tok != tokLineNum {
+			return nil
+		}
+		// TODO: file->line_num = tokc.i;
+	}
 }
 
 func (c *compiler) nextNoMacro1() error {
@@ -514,9 +525,9 @@ func (c *compiler) macroSubst(ts *tokenString, nestedList **sym, mStr []tokenVal
 		if forceBlank {
 			ts.tokStr = append(ts.tokStr, tokenValue{tok: ' '})
 			spc, forceBlank = true, false
-			if !checkSpace(tv.tok, &spc) {
-				ts.tokStr = append(ts.tokStr, tv)
-			}
+		}
+		if !checkSpace(tv.tok, &spc) {
+			ts.tokStr = append(ts.tokStr, tv)
 		}
 	}
 }
