@@ -1,8 +1,7 @@
 package nstcc
 
 type section struct {
-	dataOffset uint32
-	data       []byte
+	data []byte
 
 	shName      int32
 	shNum       int32
@@ -23,4 +22,11 @@ type section struct {
 	next  *section
 
 	name []byte
+}
+
+func (s *section) putELFStr(sym []byte) int {
+	x := len(s.data)
+	s.data = append(s.data, sym...)
+	s.data = append(s.data, 0)
+	return x
 }
