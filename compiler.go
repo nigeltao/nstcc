@@ -5,6 +5,13 @@ import (
 	"io"
 )
 
+type arch uint32
+
+const (
+	archAMD64 arch = 0
+	arch386   arch = 1
+)
+
 type macroType uint32
 
 const (
