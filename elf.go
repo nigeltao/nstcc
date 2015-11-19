@@ -50,6 +50,18 @@ func putU32LE(b []byte, u uint32) {
 	b[3] = uint8(u >> 24)
 }
 
+func elfHash(b []byte) (h uint32) {
+	for _, c := range b {
+		h = (h << 4) + uint32(c)
+		g := h & 0xf0000000
+		if g != 0 {
+			h ^= g >> 24
+		}
+		h &^= g
+	}
+	return h
+}
+
 type section struct {
 	data []byte
 
