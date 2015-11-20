@@ -7,8 +7,15 @@ import (
 )
 
 type Context struct {
+	Arch Arch
+
 	// TODO: add something about how to resolve and read filenames like
 	// "foo.h" and <stdio.h>.
+}
+
+func Compile(ctx *Context, dst io.Writer, src []byte) error {
+	// TODO.
+	return nil
 }
 
 func Preprocess(ctx *Context, dst io.Writer, src []byte) error {
@@ -37,7 +44,7 @@ type tokenSym struct {
 	str []byte
 }
 
-const symFirstAnom = 0x10000000 // First anonymous sym.
+const symFirstAnon = 0x10000000 // First anonymous sym.
 
 type sym struct {
 	tok token

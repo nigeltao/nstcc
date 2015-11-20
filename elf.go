@@ -93,12 +93,12 @@ func (s *section) putELFStr(sym []byte) int {
 	return ret
 }
 
-func (s *section) putELFSym(arch arch, value uint64, size uint64, info uint8, other uint8, shndx uint16, name []byte) int {
+func (s *section) putELFSym(arch Arch, value uint64, size uint64, info uint8, other uint8, shndx uint16, name []byte) int {
 	ret := len(s.data)
 
 	nameOffset := 0
 	switch arch {
-	case archAMD64:
+	case ArchAMD64:
 		nameOffset = len(s.data)
 		s.data = appendELFSym64(s.data, elf.Sym64{
 			Name:  0, // Placeholder.

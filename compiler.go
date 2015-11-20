@@ -5,11 +5,11 @@ import (
 	"io"
 )
 
-type arch uint32
+type Arch uint32
 
 const (
-	archAMD64 arch = 0
-	arch386   arch = 1
+	ArchAMD64 Arch = 0
+	Arch386   Arch = 1
 )
 
 type macroType uint32
@@ -64,11 +64,24 @@ type compiler struct {
 	tok  token
 	tokc cValue
 
+	textSection     *section
+	dataSection     *section
+	bssSection      *section
+	curTextSection  *section
+	lastTextSection *section
+
 	globalStack      *sym
 	localStack       *sym
 	localLabelStack  *sym
 	globalLabelStack *sym
 	defineStack      *sym
+
+	rsym    int32
+	anonSym int32
+	ind     int32
+	loc     int32
+
+	funcName []byte
 
 	idents idents
 }
@@ -83,6 +96,7 @@ func newCompiler(ctx *Context, dst io.Writer, src []byte) *compiler {
 		dst:      bw,
 		src:      src,
 		tokFlags: tokFlagBOL | tokFlagBOF,
+		anonSym:  symFirstAnon,
 	}
 	c.idents.init()
 	return c

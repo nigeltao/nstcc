@@ -60,7 +60,7 @@ func (m *idents) byStr(s []byte) (*tokenSym, error) {
 // The TCC code calls this tok_alloc_new.
 func (m *idents) alloc(p **tokenSym, s []byte) (*tokenSym, error) {
 	t := tokIdent + token(len(m.list))
-	if t >= symFirstAnom {
+	if t >= symFirstAnon {
 		return nil, errors.New("nstcc: memory full")
 	}
 	y := &tokenSym{
